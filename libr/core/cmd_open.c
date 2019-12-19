@@ -976,7 +976,7 @@ static void __rebase_everything(RCore *core, RList *old_sections, ut64 old_base)
 				var->addr += diff;
 				r_anal_var_add (core->anal, var->addr, 1, var->delta, var->kind, var->type, var->size, var->isarg, var->name);
 				var_access = sdb_fmt ("var.0x%"PFMT64x ".%d.%d.access", var->addr, 1, var->delta);
-				sdb_set (core->anal->sdb_fcns, var_access, access, NULL);
+				sdb_set (core->anal->sdb_fcns, var_access, access, 0);
 				free (access);
 			}
 			r_list_free (var_list);
@@ -1680,9 +1680,8 @@ static int cmd_open(void *data, const char *input) {
 				}
 				perms = (input[3] == '+')? R_PERM_R|R_PERM_W: 0;
 				r_core_file_reopen (core, input + 4, perms, 0);
-				// TODO: Use API instead of !rabin2 -rk
 				if (desc) {
-					r_core_cmdf (core, ".!rabin2 -rk '' '%s'", desc->name);
+					r_core_bin_load_structs (core, desc->name);
 				}
 			} else if ('?' == input[2]) {
 				r_core_cmd_help (core, help_msg_oon);
